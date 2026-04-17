@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Nizhal — Kerala Bus Sun Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Mandali&family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g1:#0a3d2e;--g2:#1a6b4a;--g3:#2d9e6b;--g4:#7ec8a0;--g5:#a8dfc4;--g6:#e6f5ed;
+  --amb:#e8a230;--sun:#e05a30;
+  --cream:#faf7f0;--warm:#fffef9;--txt:#0a2a1e;--txt2:#4a6a58;--txt3:#8aaa96;
+  --r:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+
+.header{background:var(--g1);padding:1.4rem 1.4rem 1.1rem;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:-50px;right:-40px;width:190px;height:190px;border-radius:50%;background:rgba(45,158,107,0.11);}
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+.brand-name{font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--g5);letter-spacing:-0.02em;line-height:1;}
+.brand-name em{color:var(--amb);font-style:italic;}
+.brand-mal{font-family:'Mandali',sans-serif;font-size:1rem;color:rgba(168,223,196,.5);margin-top:3px;}
+.brand-tag{font-size:.69rem;color:rgba(168,223,196,.38);margin-top:8px;letter-spacing:.14em;text-transform:uppercase;font-weight:300;}
+.by-box{text-align:right;}
+.by-lbl{font-size:.6rem;color:rgba(168,223,196,.38);text-transform:uppercase;letter-spacing:.1em;}
+.by-name{font-size:.9rem;color:var(--amb);font-weight:500;margin-top:1px;}
+
+.main{padding:1.1rem 1.1rem 3rem;max-width:480px;margin:0 auto;}
+
+/* TABS */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem;}
+.tab{padding:10px 8px;border-radius:10px;border:1.5px solid rgba(10,61,46,.12);background:var(--warm);color:var(--txt2);font-size:.78rem;font-weight:500;cursor:pointer;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;line-height:1.3;}
+.tab small{display:block;font-size:.64rem;font-weight:300;color:var(--txt3);margin-top:2px;}
+.tab.active{background:var(--g1);color:var(--g5);border-color:var(--g1);}
+.tab.active small{color:var(--g4);}
+
+.panel{display:none;animation:fadeIn .2s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* GPS */
+.gps-card{background:var(--g1);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:.85rem;}
+.gps-row{display:flex;align-items:center;gap:10px;}
+.gpulse{width:34px;height:34px;border-radius:50%;background:rgba(45,158,107,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.gpulse::before{content:'';position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid var(--g3);animation:rip 2s infinite;opacity:0;}
+@keyframes rip{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.9);opacity:0}}
+.gdot{width:9px;height:9px;border-radius:50%;background:#6ee7b7;}
+.gdot.off{background:#3a5545;} .gdot.ld{background:var(--amb);animation:bl .7s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
+.gi{flex:1;} .gt{font-size:.79rem;font-weight:500;color:var(--g5);} .gs{font-size:.67rem;color:rgba(168,223,196,.42);margin-top:2px;}
+.btn-gps{padding:7px 14px;border-radius:18px;background:var(--g3);color:#fff;font-size:.74rem;font-weight:500;border:none;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:background .2s;}
+.btn-gps:hover{background:var(--g2);} .btn-gps:disabled{background:#1e4535;color:#3a6050;cursor:not-allowed;}
+
+/* HEADING STRIP */
+.hstrip{display:flex;align-items:center;gap:10px;background:var(--warm);border:1px solid rgba(10,61,46,.1);border-radius:12px;padding:.68rem 1rem;margin-bottom:.85rem;transition:all .3s;}
+.hstrip.on{background:var(--g6);border-color:var(--g3);}
+.cring{width:37px;height:37px;border:2px solid rgba(10,61,46,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0;background:#fff;transition:transform .5s ease;}
+.hstrip.on .cring{border-color:var(--g3);}
+.hi{flex:1;} .ht{font-size:.77rem;font-weight:500;color:var(--txt);} .hs{font-size:.67rem;color:var(--txt3);margin-top:1px;}
+.spill{font-size:.67rem;padding:2px 8px;border-radius:8px;background:var(--g6);color:var(--g2);border:.5px solid var(--g3);font-weight:500;display:none;}
+
+/* CONTROLS */
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem;}
+.cg{display:flex;flex-direction:column;gap:4px;}
+.clabel{font-size:.67rem;font-weight:500;color:var(--txt3);text-transform:uppercase;letter-spacing:.09em;display:flex;align-items:center;gap:5px;}
+.ab{font-size:.59rem;padding:1px 6px;border-radius:5px;background:var(--g6);color:var(--g2);border:.5px solid var(--g3);text-transform:none;letter-spacing:0;}
+.ab.m{background:#f0ede6;color:#7a6a3a;border-color:#d4c8a8;}
+select{width:100%;padding:8px 26px 8px 9px;border-radius:10px;border:1px solid rgba(10,61,46,.12);background:var(--warm);color:var(--txt);font-size:.79rem;font-family:'DM Sans',sans-serif;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%230a3d2e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+select:focus{outline:2px solid var(--g3);outline-offset:1px;}
+
+/* SUN BAR */
+.sunbar{display:flex;align-items:center;gap:10px;background:var(--warm);border:1px solid rgba(10,61,46,.08);border-radius:12px;padding:.62rem 1rem;margin-bottom:.85rem;}
+.sorb{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#fde68a,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;box-shadow:0 0 0 4px rgba(245,158,11,.1);}
+.stxt{font-size:.77rem;color:var(--txt);line-height:1.45;}
+
+/* LOCAL COMPASS CARD */
+.local-card{background:var(--g1);border-radius:var(--r);padding:1.1rem;margin-bottom:.85rem;}
+.local-t{font-size:.77rem;color:var(--g5);font-weight:500;margin-bottom:.8rem;}
+.sc-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:1rem;}
+.sc-ring{width:148px;height:148px;border-radius:50%;border:2px solid rgba(45,158,107,.28);position:relative;display:flex;align-items:center;justify-content:center;background:rgba(10,50,35,.55);}
+.sc-ring .cn{position:absolute;font-size:.59rem;color:rgba(168,223,196,.5);font-weight:600;}
+.sc-N{top:7px;left:50%;transform:translateX(-50%);}
+.sc-S{bottom:7px;left:50%;transform:translateX(-50%);}
+.sc-E{right:9px;top:50%;transform:translateY(-50%);}
+.sc-W{left:9px;top:50%;transform:translateY(-50%);}
+.sarrow{position:absolute;width:50px;height:50px;display:flex;align-items:center;justify-content:center;transition:transform .7s cubic-bezier(.34,1.56,.64,1);}
+.sarrow-inner{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fef3c7,#f59e0b);box-shadow:0 0 14px rgba(245,158,11,.55);}
+.sc-lbl{font-size:.71rem;color:rgba(168,223,196,.58);text-align:center;}
+.seat-hint{font-size:.8rem;color:var(--g5);text-align:center;font-weight:500;line-height:1.55;padding:0 .5rem;}
+.seat-hint em{color:var(--amb);font-style:normal;font-weight:600;}
+.btn-ref{padding:6px 14px;border-radius:16px;background:rgba(45,158,107,.18);color:var(--g4);font-size:.71rem;border:1px solid rgba(45,158,107,.28);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px;transition:background .2s;}
+.btn-ref:hover{background:rgba(45,158,107,.3);}
+
+/* SIDE CARDS */
+.scards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem;}
+.scard{border-radius:10px;padding:.8rem;border:1.5px solid;text-align:center;}
+.scard.shade{background:#d8f0e6;border-color:#2d9e6b;}
+.scard.sunny{background:#fde8d8;border-color:#e05a30;}
+.scard.neutral{background:#f0ede6;border-color:#c4c0b4;}
+.scard-ico{font-size:1.3rem;margin-bottom:4px;}
+.scard-lbl{font-size:.74rem;font-weight:600;margin-bottom:2px;}
+.scard.shade .scard-lbl{color:#0a3d2e;} .scard.sunny .scard-lbl{color:#7a2810;} .scard.neutral .scard-lbl{color:#5a4a2a;}
+.scard-desc{font-size:.64rem;line-height:1.4;}
+.scard.shade .scard-desc{color:#1a6b4a;} .scard.sunny .scard-desc{color:#a03418;} .scard.neutral .scard-desc{color:#7a6a4a;}
+
+/* LEGEND */
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.85rem;}
+.leg{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--txt2);}
+.ld{width:10px;height:10px;border-radius:3px;}
+.ld.e{background:#2d9e6b;} .ld.g{background:#7ec8a0;} .ld.m{background:#e8a230;} .ld.b{background:#e05a30;}
+
+/* BUS DIAGRAM */
+.bus-wrap{background:var(--g1);border-radius:18px;padding:1.1rem;margin-bottom:.85rem;}
+.bus-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.bus-htxt{font-size:.67rem;color:rgba(168,223,196,.48);letter-spacing:.1em;text-transform:uppercase;}
+.bus-date{font-size:.65rem;color:rgba(168,223,196,.32);}
+.bus-body{background:var(--warm);border-radius:12px;padding:12px 6px 8px;border:2px solid rgba(45,158,107,.26);}
+.bfront{text-align:center;font-size:.68rem;color:#8aaa9a;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fl{flex:1;height:1px;background:rgba(10,61,46,.08);}
+/* column header */
+.chdr{display:flex;justify-content:space-between;padding:0 20px 0 20px;margin-bottom:6px;align-items:center;}
+.chip{font-size:.59rem;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.04em;}
+.chip-sun{background:#fde8d8;color:#8a2810;border:.5px solid #e05a30;}
+.chip-shade{background:#d8f0e6;color:#0a4d2e;border:.5px solid #2d9e6b;}
+.chip-n{background:#f0ede6;color:#6a7a6a;border:.5px solid #c4c0b4;}
+/* rows */
+.srow{display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+.rn{font-size:.6rem;color:rgba(10,61,46,.28);width:14px;text-align:center;flex-shrink:0;}
+.ag{width:14px;flex-shrink:0;}
+/* seats — 2+3 */
+.seat{height:30px;border-radius:6px;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:.57rem;font-weight:600;cursor:pointer;flex-shrink:0;transition:transform .12s,box-shadow .12s;letter-spacing:.02em;}
+.seat.lw{width:43px;} .seat.la{width:39px;}
+.seat.ra{width:36px;} .seat.rm{width:36px;} .seat.rw{width:40px;}
+.seat:hover{transform:scale(1.09);box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.seat.excellent{background:#d8f0e6;border-color:#2d9e6b;color:#0a4d2e;}
+.seat.good{background:#e6f5ed;border-color:#7ec8a0;color:#1a5a3a;}
+.seat.moderate{background:#fef3e0;border-color:#e8a230;color:#7a5010;}
+.seat.bad{background:#fde8d8;border-color:#e05a30;color:#8a2810;}
+.seat.selected{outline:3px solid #378ADD;outline-offset:2px;}
+
+/* REC */
+.rec{border-radius:var(--r);padding:.88rem 1.05rem;margin-bottom:.85rem;border:1px solid;transition:all .3s;}
+.rec-t{font-size:.84rem;font-weight:600;margin-bottom:3px;font-family:'DM Serif Display',serif;}
+.rec-p{font-size:.75rem;line-height:1.65;}
+
+/* INFO */
+.icard{background:var(--warm);border:1px solid rgba(10,61,46,.08);border-radius:var(--r);padding:.88rem 1.05rem;margin-bottom:.8rem;}
+.icard h3{font-size:.81rem;font-weight:500;color:var(--txt);margin-bottom:4px;font-family:'DM Serif Display',serif;}
+.icard p{font-size:.73rem;color:var(--txt2);line-height:1.7;}
+
+footer{text-align:center;padding:1.4rem 1rem 2.5rem;border-top:1px solid rgba(10,61,46,.08);}
+.ft-brand{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--g1);}
+.ft-brand em{color:var(--amb);font-style:italic;}
+.ft-sub{font-size:.68rem;color:var(--txt3);margin-top:3px;letter-spacing:.06em;}
+.ft-by{font-size:.64rem;color:#b0c0b4;margin-top:6px;}
+.ft-by strong{color:var(--g2);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hrow">
+    <div>
+      <div class="brand-name">Ni<em>zh</em>al</div>
+      <div class="brand-mal">നിഴൽ · shade</div>
+      <div class="brand-tag">Kerala bus sun seat guide</div>
+    </div>
+    <div class="by-box">
+      <div class="by-lbl">an app by</div>
+      <div class="by-name">Santo</div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('long')" id="tab-long">
+      Long Route Bus
+      <small>KSRTC · inter-district journeys</small>
+    </button>
+    <button class="tab" onclick="setMode('local')" id="tab-local">
+      Local / City Bus
+      <small>town · city · village routes</small>
+    </button>
+  </div>
+
+  <!-- ══════ LONG ROUTE PANEL ══════ -->
+  <div class="panel active" id="panel-long">
+
+    <div class="gps-card">
+      <div class="gps-row">
+        <div class="gpulse"><div class="gdot off" id="gpsDot"></div></div>
+        <div class="gi">
+          <div class="gt" id="gpsT">Live location tracking</div>
+          <div class="gs" id="gpsS">Enable GPS to auto-detect travel direction</div>
+        </div>
+        <button class="btn-gps" id="gpsBtn" onclick="startGPS()">Enable GPS</button>
+      </div>
+    </div>
+
+    <div class="hstrip" id="hstrip">
+      <div class="cring" id="compass">◎</div>
+      <div class="hi">
+        <div class="ht" id="headT">GPS inactive</div>
+        <div class="hs" id="headS">Grant permission to auto-detect your heading</div>
+      </div>
+      <span class="spill" id="spill"></span>
+    </div>
+
+    <div class="ctrls">
+      <div class="cg">
+        <div class="clabel">Direction <span class="ab m" id="dirBadge">manual</span></div>
+        <select id="dirSel" onchange="onManualDir()">
+          <option value="north">↑ North — Kozhikode, Kannur, Kasaragod</option>
+          <option value="south">↓ South — Trivandrum, Kollam, Alappuzha</option>
+          <option value="east">→ East — Palakkad, Wayanad, Idukki, Munnar</option>
+          <option value="west">← West — Thrissur coast, Malappuram coast, Ponnani</option>
+        </select>
+      </div>
+      <div class="cg">
+        <div class="clabel">Travel time</div>
+        <select id="timeSel" onchange="updateLong()"></select>
+      </div>
+    </div>
+
+    <div class="sunbar">
+      <div class="sorb">☀</div>
+      <div class="stxt" id="sunTxt">Select direction and time of travel</div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="ld e"></div>Excellent shade</div>
+      <div class="leg"><div class="ld g"></div>Good</div>
+      <div class="leg"><div class="ld m"></div>Some sun</div>
+      <div class="leg"><div class="ld b"></div>Avoid</div>
+    </div>
+
+    <div class="bus-wrap">
+      <div class="bus-hdr">
+        <div class="bus-htxt">Top view · 2 left + 3 right layout</div>
+        <div class="bus-date" id="busDate"></div>
+      </div>
+      <div class="bus-body">
+        <div class="bfront"><div class="fl"></div><span id="frontLbl">▲ Front of bus</span><div class="fl"></div></div>
+        <div class="chdr">
+          <div style="display:flex;gap:3px;">
+            <span class="chip chip-n" id="hLW">L-WIN</span>
+            <span class="chip chip-n" id="hLA">L-AIS</span>
+          </div>
+          <span style="font-size:.56rem;color:#a0b0a8;">AISLE</span>
+          <div style="display:flex;gap:3px;">
+            <span class="chip chip-n" id="hRA">R-AIS</span>
+            <span class="chip chip-n" id="hRM">R-MID</span>
+            <span class="chip chip-n" id="hRW">R-WIN</span>
+          </div>
+        </div>
+        <div id="gridL"></div>
+      </div>
+    </div>
+
+    <div class="rec" id="recL" style="background:#e6f5ed;border-color:#2d9e6b;">
+      <div class="rec-t" id="recTL" style="color:#0a3d2e;">Best seats for your journey</div>
+      <div class="rec-p" id="recPL" style="color:#1a6b4a;">Enable GPS or choose direction manually above.</div>
+    </div>
+
+    <div class="icard">
+      <h3>Kerala bus layout — 2 left + 3 right</h3>
+      <p>Most Kerala KSRTC and private buses have 2 seats on the left side and 3 on the right. The extra seat on the right (3-seat side) means more passengers face the sun when it comes from the east (morning) or west (afternoon). The shaded side is almost always the better pick for window seats. Rows 3–8 are the best zone — front rows catch windshield glare, rear rows get engine heat.</p>
+    </div>
+
+    <div class="icard">
+      <h3>District direction reference</h3>
+      <p><strong>Northbound:</strong> Kozhikode (Calicut), Malappuram, Kannur, Kasaragod &nbsp;·&nbsp; <strong>Southbound:</strong> Ernakulam (Kochi), Alappuzha, Kollam, Thiruvananthapuram &nbsp;·&nbsp; <strong>Eastbound:</strong> Palakkad (Palakkad gap), Wayanad, Idukki, Munnar, Thekkady &nbsp;·&nbsp; <strong>Westbound:</strong> Kozhikode beach, Malappuram coast, Ponnani, Thrissur coast, Alappuzha backwaters</p>
+    </div>
+
+  </div>
+
+  <!-- ══════ LOCAL ROUTE PANEL ══════ -->
+  <div class="panel" id="panel-local">
+
+    <div class="local-card">
+      <div class="local-t">Live sun compass — works for any bus direction</div>
+      <div class="sc-wrap">
+        <div class="sc-ring" id="scRing">
+          <span class="cn sc-N">N</span>
+          <span class="cn sc-S">S</span>
+          <span class="cn sc-E">E</span>
+          <span class="cn sc-W">W</span>
+          <div class="sarrow" id="sunArrow">
+            <div class="sarrow-inner"></div>
+          </div>
+        </div>
+        <div class="sc-lbl" id="scLbl">Calculating sun position…</div>
+      </div>
+      <div class="seat-hint" id="seatHint">Loading…</div>
+      <div style="text-align:center;margin-top:10px;">
+        <button class="btn-ref" onclick="updateLocal()">↻ Recalculate now</button>
+      </div>
+    </div>
+
+    <div class="scards">
+      <div class="scard neutral" id="scLeft">
+        <div class="scard-ico" id="scLIco">◑</div>
+        <div class="scard-lbl" id="scLLbl">Left side (2 seats)</div>
+        <div class="scard-desc" id="scLDesc">Calculating…</div>
+      </div>
+      <div class="scard neutral" id="scRight">
+        <div class="scard-ico" id="scRIco">◑</div>
+        <div class="scard-lbl" id="scRLbl">Right side (3 seats)</div>
+        <div class="scard-desc" id="scRDesc">Calculating…</div>
+      </div>
+    </div>
+
+    <div class="ctrls" style="grid-template-columns:1fr;">
+      <div class="cg">
+        <div class="clabel">Time override (auto-set to current time)</div>
+        <select id="timeSelLoc" onchange="updateLocal()"></select>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="ld e"></div>Excellent shade</div>
+      <div class="leg"><div class="ld g"></div>Good</div>
+      <div class="leg"><div class="ld m"></div>Some sun</div>
+      <div class="leg"><div class="ld b"></div>Avoid</div>
+    </div>
+
+    <div class="bus-wrap">
+      <div class="bus-hdr">
+        <div class="bus-htxt">Top view · 2 left + 3 right layout</div>
+        <div class="bus-date" id="busDateL"></div>
+      </div>
+      <div class="bus-body">
+        <div class="bfront"><div class="fl"></div><span>▲ Front of bus</span><div class="fl"></div></div>
+        <div class="chdr">
+          <div style="display:flex;gap:3px;">
+            <span class="chip chip-n" id="lhLW">L-WIN</span>
+            <span class="chip chip-n" id="lhLA">L-AIS</span>
+          </div>
+          <span style="font-size:.56rem;color:#a0b0a8;">AISLE</span>
+          <div style="display:flex;gap:3px;">
+            <span class="chip chip-n" id="lhRA">R-AIS</span>
+            <span class="chip chip-n" id="lhRM">R-MID</span>
+            <span class="chip chip-n" id="lhRW">R-WIN</span>
+          </div>
+        </div>
+        <div id="gridLoc"></div>
+      </div>
+    </div>
+
+    <div class="rec" id="recLoc" style="background:#e6f5ed;border-color:#2d9e6b;">
+      <div class="rec-t" id="recTLoc" style="color:#0a3d2e;">Recommended seats right now</div>
+      <div class="rec-p" id="recPLoc" style="color:#1a6b4a;">Calculating based on current sun position…</div>
+    </div>
+
+    <div class="icard">
+      <h3>Why this works for local routes</h3>
+      <p>Local city and town buses in Kerala change direction often — you may not know if you're heading north or south. Nizhal uses the actual sun position calculated from the current time and Kerala's latitude (≈10°N) to determine which compass direction the sun is in. It then shows you which side of the bus — regardless of its direction — gets more direct sun right now, and recommends the shaded side.</p>
+    </div>
+
+    <div class="icard">
+      <h3>Quick boarding tip</h3>
+      <p>When you board any local bus, glance at the sun through the windows. The side where you can see the sun directly is the sunny side — move to the opposite side. At midday (10am–2pm), the sun is nearly overhead so both sides are similar; pick an aisle seat in the middle rows instead.</p>
+    </div>
+
+  </div>
+
+  <div class="icard">
+    <h3>About Nizhal · നിഴൽ</h3>
+    <p>Nizhal means "shade" in Malayalam. Built for Kerala bus travellers to find the coolest, shadiest seat on any route. Your location data never leaves your device — all calculations happen on your phone.</p>
+  </div>
+
+</main>
+
+<footer>
+  <div class="ft-brand">Ni<em>zh</em>al · നിഴൽ</div>
+  <div class="ft-sub">Kerala bus sun seat guide</div>
+  <div class="ft-by">crafted by <strong>Santo</strong></div>
+</footer>
+
+<script>
+// ── Setup ──
+const now = new Date();
+const dStr = now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+document.getElementById('busDate').textContent = dStr;
+document.getElementById('busDateL').textContent = dStr;
+
+const hr = now.getHours();
+const slots = [
+  {v:'morning', l:'Morning · 6am – 10am',  r:[6,10]},
+  {v:'midday',  l:'Midday · 10am – 2pm',   r:[10,14]},
+  {v:'afternoon',l:'Afternoon · 2pm – 6pm', r:[14,18]},
+  {v:'evening', l:'Evening · 6pm – 8pm',   r:[18,20]}
+];
+['timeSel','timeSelLoc'].forEach(id => {
+  const s = document.getElementById(id);
+  let found = false;
+  slots.forEach(sl => {
+    const o = document.createElement('option');
+    o.value = sl.v; o.textContent = sl.l;
+    if (!found && hr >= sl.r[0] && hr < sl.r[1]) { o.selected = true; found = true; }
+    s.appendChild(o);
+  });
+  if (!s.value) s.value = 'morning';
+});
+document.getElementById('timeSelLoc').addEventListener('change', updateLocal);
+
+// ── Mode ──
+function setMode(m) {
+  ['long','local'].forEach(x => {
+    document.getElementById('tab-'+x).classList.toggle('active', x===m);
+    document.getElementById('panel-'+x).classList.toggle('active', x===m);
+  });
+  if (m==='local') updateLocal();
+}
+
+// ── GPS ──
+let lastPos = null;
+const toRad = d => d*Math.PI/180;
+const haversine = (a,b,c,d) => {
+  const R=6371000, dL=toRad(c-a), dO=toRad(d-b);
+  const x=Math.sin(dL/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dO/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+};
+const brgCalc = (a,b,c,d) => {
+  const dO=toRad(d-b);
+  const y=Math.sin(dO)*Math.cos(toRad(c));
+  const x=Math.cos(toRad(a))*Math.sin(toRad(c))-Math.sin(toRad(a))*Math.cos(toRad(c))*Math.cos(dO);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+};
+const compassChar = b => ['↑','↗','→','↘','↓','↙','←','↖'][Math.round(b/45)%8];
+const toCard = b => {
+  if (b>=337.5||b<22.5) return {d:'north',l:'North'};
+  if (b<67.5)  return {d:'north',l:'North-East'};
+  if (b<112.5) return {d:'east',l:'East'};
+  if (b<157.5) return {d:'south',l:'South-East'};
+  if (b<202.5) return {d:'south',l:'South'};
+  if (b<247.5) return {d:'south',l:'South-West'};
+  if (b<292.5) return {d:'west',l:'West'};
+  return {d:'north',l:'North-West'};
+};
+
+function startGPS() {
+  if (!navigator.geolocation) { alert('GPS not supported on this device.'); return; }
+  document.getElementById('gpsDot').className='gdot ld';
+  document.getElementById('gpsT').textContent='Requesting location…';
+  document.getElementById('gpsBtn').disabled=true;
+  document.getElementById('gpsBtn').textContent='Locating…';
+  navigator.geolocation.watchPosition(onPos, onErr, {enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+function onPos(pos) {
+  const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
+  document.getElementById('gpsDot').className='gdot';
+  document.getElementById('gpsT').textContent=`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+  document.getElementById('gpsS').textContent=`Accuracy ±${Math.round(acc)}m · live`;
+  document.getElementById('gpsBtn').textContent='Live ●';
+  document.getElementById('gpsBtn').disabled=true;
+  if (lastPos) {
+    const dist=haversine(lastPos.lat,lastPos.lon,lat,lon);
+    const dt=(pos.timestamp-lastPos.time)/1000;
+    const spd=dist/dt*3.6;
+    const b=brgCalc(lastPos.lat,lastPos.lon,lat,lon);
+    const card=toCard(b);
+    document.getElementById('compass').textContent=compassChar(b);
+    document.getElementById('compass').style.transform=`rotate(${b}deg)`;
+    document.getElementById('hstrip').className='hstrip on';
+    if (spd>10) {
+      document.getElementById('headT').textContent=`Heading ${card.l} · ${Math.round(b)}°`;
+      document.getElementById('headS').textContent='Direction auto-detected from GPS movement';
+      const sp=document.getElementById('spill'); sp.style.display='inline'; sp.textContent=`${Math.round(spd)} km/h`;
+      document.getElementById('dirSel').value=card.d;
+      document.getElementById('dirBadge').textContent='auto GPS';
+      document.getElementById('dirBadge').className='ab';
+    } else {
+      document.getElementById('headT').textContent=`Speed ${Math.round(spd)} km/h — too slow`;
+      document.getElementById('headS').textContent='Use manual direction below';
+      document.getElementById('spill').style.display='none';
+    }
+  }
+  lastPos={lat,lon,time:pos.timestamp};
+  updateLong();
+}
+function onErr(e) {
+  document.getElementById('gpsDot').className='gdot off';
+  document.getElementById('gpsBtn').disabled=false;
+  document.getElementById('gpsBtn').textContent='Retry GPS';
+  const m={1:'Permission denied',2:'GPS unavailable',3:'Timed out'};
+  document.getElementById('gpsT').textContent=m[e.code]||'GPS error';
+  document.getElementById('gpsS').textContent='Using manual direction below';
+}
+function onManualDir() {
+  document.getElementById('dirBadge').textContent='manual';
+  document.getElementById('dirBadge').className='ab m';
+  updateLong();
+}
+
+// ── Sun side logic ──
+function getSunSide(dir, time) {
+  if (time==='evening') return {side:'none',desc:'Evening — soft low sun, no discomfort inside the bus'};
+  const sun={morning:'east',midday:'overhead',afternoon:'west'}[time];
+  if (sun==='overhead') return {side:'both-mild',desc:'Midday sun is nearly overhead — both sides similar, diffused light'};
+  const map={
+    north:{east:'right',west:'left'},
+    south:{east:'left',west:'right'},
+    east:{east:'front',west:'back'},
+    west:{east:'back',west:'front'}
+  };
+  const side=map[dir]?.[sun]||'right';
+  const ln={right:'right side (3-seat side)',left:'left side (2-seat side)',front:'front windshield area',back:'rear window area'}[side];
+  return {side,desc:`Sun is in the ${sun} — ${ln} gets direct rays`};
+}
+
+// ── Seat rating: cols 0=LW,1=LA | 2=RA,3=RM,4=RW ──
+function rateS(row,col,sun) {
+  const mid=row>=3&&row<=7, front=row<=2, rear=row>=8;
+  if (sun==='none') return 'excellent';
+  if (sun==='both-mild') {
+    if (col===0||col===4) return mid?'moderate':'good';
+    if (col===3) return mid?'moderate':'good';
+    return 'good';
+  }
+  if (sun==='right') {
+    if (col===4) return mid?'bad':'moderate';
+    if (col===3) return mid?'bad':'moderate';
+    if (col===2) return mid?'moderate':'good';
+    if (col===1) return 'good';
+    return front?'moderate':'excellent';
+  }
+  if (sun==='left') {
+    if (col===0) return mid?'bad':'moderate';
+    if (col===1) return mid?'moderate':'good';
+    if (col===2) return 'good';
+    if (col===3) return front?'moderate':'good';
+    return front?'moderate':'excellent';
+  }
+  if (sun==='front') {
+    if (front&&(col===0||col===3||col===4)) return 'bad';
+    if (front) return 'moderate';
+    if (mid&&(col===0||col===4)) return 'moderate';
+    return 'excellent';
+  }
+  if (sun==='back') {
+    if (rear&&(col===0||col===3||col===4)) return 'bad';
+    if (rear) return 'moderate';
+    return mid&&(col===0||col===4)?'moderate':'excellent';
+  }
+  return 'good';
+}
+
+function buildGrid(gridId, sun, isLocal) {
+  const g=document.getElementById(gridId); g.innerHTML='';
+  const lLabs=['LW','LA'], rLabs=['RA','RM','RW'];
+  const cls=['lw','la','ra','rm','rw'];
+  for (let r=0;r<10;r++) {
+    const row=document.createElement('div'); row.className='srow';
+    const rn=document.createElement('div'); rn.className='rn'; rn.textContent=r+1; row.appendChild(rn);
+    for (let c=0;c<2;c++) {
+      const s=document.createElement('div');
+      const rt=rateS(r,c,sun);
+      s.className=`seat ${cls[c]} ${rt}`; s.textContent=lLabs[c];
+      const cc=c; s.addEventListener('click',()=>clickSeat(r,cc,rt,isLocal));
+      row.appendChild(s);
+    }
+    const ag=document.createElement('div'); ag.className='ag'; row.appendChild(ag);
+    for (let c=2;c<5;c++) {
+      const s=document.createElement('div');
+      const rt=rateS(r,c,sun);
+      s.className=`seat ${cls[c]} ${rt}`; s.textContent=rLabs[c-2];
+      const cc=c; s.addEventListener('click',()=>clickSeat(r,cc,rt,isLocal));
+      row.appendChild(s);
+    }
+    g.appendChild(row);
+  }
+}
+
+function clickSeat(r,c,rat,isLocal) {
+  const gid=isLocal?'gridLoc':'gridL';
+  document.querySelectorAll(`#${gid} .seat.selected`).forEach(x=>x.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  const names=['Left window','Left aisle','Right aisle','Right middle','Right window'];
+  const extra=c===3?' (middle of 3-seat side)':c===4?' (window on 3-seat side — most exposed if sunny)':'';
+  const tips={
+    excellent:'Perfect! Full shade for your journey. Very comfortable even in Kerala summer heat.',
+    good:'Good seat — mostly shaded with only brief, mild sun exposure.',
+    moderate:'Manageable, but bring a newspaper or cloth to block the window glass.',
+    bad:'Avoid if possible — strong direct sun for most of the journey. Very uncomfortable.'
+  };
+  setRec(isLocal,`Row ${r+1} · ${names[c]}${extra}`,tips[rat],rat);
+}
+
+function setChips(pfx, sun) {
+  const map={
+    right:['shade','shade','sun','sun','sun'],
+    left:['sun','sun','shade','shade','shade'],
+    'both-mild':['n','n','n','n','n'],
+    front:['n','n','n','n','n'],
+    back:['n','n','n','n','n'],
+    none:['n','n','n','n','n']
+  };
+  const cls=map[sun]||['n','n','n','n','n'];
+  const ids=['LW','LA','RA','RM','RW'];
+  const labels={
+    right:['L-WIN ✓','L-AIS ✓','R-AIS ✗','R-MID ✗','R-WIN ✗'],
+    left:['L-WIN ✗','L-AIS ✗','R-AIS ✓','R-MID ✓','R-WIN ✓'],
+    'both-mild':['L-WIN','L-AIS','R-AIS','R-MID','R-WIN'],
+    none:['L-WIN','L-AIS','R-AIS','R-MID','R-WIN'],
+    front:['L-WIN','L-AIS','R-AIS','R-MID','R-WIN'],
+    back:['L-WIN','L-AIS','R-AIS','R-MID','R-WIN']
+  };
+  const lbls=labels[sun]||labels.none;
+  const chipCls={'shade':'chip chip-shade','sun':'chip chip-sun','n':'chip chip-n'};
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(pfx+id);
+    if (el) { el.className=chipCls[cls[i]]; el.textContent=lbls[i]; }
+  });
+}
+
+function setRec(isLocal,title,text,hint) {
+  const bId=isLocal?'recLoc':'recL', tId=isLocal?'recTLoc':'recTL', pId=isLocal?'recPLoc':'recPL';
+  const c={excellent:['#e6f5ed','#2d9e6b','#0a3d2e','#1a6b4a'],good:['#e6f5ed','#2d9e6b','#0a3d2e','#1a6b4a'],moderate:['#fef3e0','#e8a230','#7a5010','#7a5010'],bad:['#fde8d8','#e05a30','#8a2810','#8a2810']}[hint]||['#e6f5ed','#2d9e6b','#0a3d2e','#1a6b4a'];
+  const b=document.getElementById(bId); b.style.background=c[0]; b.style.borderColor=c[1];
+  const t=document.getElementById(tId); t.style.color=c[2]; t.textContent=title;
+  const p=document.getElementById(pId); p.style.color=c[3]; p.textContent=text;
+}
+
+// ── Long route update ──
+function updateLong() {
+  const dir=document.getElementById('dirSel').value;
+  const time=document.getElementById('timeSel').value;
+  const {side,desc}=getSunSide(dir,time);
+  document.getElementById('sunTxt').textContent=desc;
+  const dl={north:'▲ Northbound → Kozhikode / Kannur / Kasaragod',south:'▼ Southbound → Trivandrum / Kollam / Kochi',east:'▶ Eastbound → Palakkad / Wayanad / Munnar',west:'◀ Westbound → Coast / Ponnani / Thrissur west'};
+  document.getElementById('frontLbl').textContent=dl[dir]||'▲ Front of bus';
+  setChips('h',side);
+  buildGrid('gridL',side,false);
+  const msgs={
+    right:'Sit on the LEFT side (2-seat side) — rows 3–8 for best shade. Both left window and left aisle seats are comfortable. The entire right 3-seat side (window, middle, aisle) gets direct sun in middle rows.',
+    left:'Sit on the RIGHT side (3-seat side) — rows 3–8. Right window and right middle seat are most shaded. Even right aisle is better than the left side. Avoid both left-side seats.',
+    front:'Sun enters from the front windshield — avoid rows 1–3 entirely. Rows 5–10 on either side are shaded. Middle rows (4–7) are the sweet spot.',
+    back:'Rear window brings in sun — avoid rows 8–10. Front and middle rows (1–7) give the best shade on both sides.',
+    'both-mild':'Midday sun is nearly overhead — both sides get similar diffused light. Pick aisle seats (left-aisle or right-aisle) in rows 3–7 to minimise glass exposure.',
+    none:'Evening light is soft and gentle. Any seat is comfortable — sit freely!'
+  };
+  setRec(false,'Best seats for your journey',msgs[side]||'',side==='none'?'excellent':'good');
+}
+
+// ── Local route sun azimuth ──
+function sunAzimuth(time) {
+  return {morning:90,midday:175,afternoon:265,evening:290}[time]||175;
+}
+
+function updateLocal() {
+  const time=document.getElementById('timeSelLoc').value;
+  const az=sunAzimuth(time);
+  document.getElementById('sunArrow').style.transform=`rotate(${az}deg)`;
+  const azLbls={morning:'East — morning sun',midday:'South — midday overhead',afternoon:'West — afternoon sun',evening:'West-low — evening, soft light'};
+  document.getElementById('scLbl').textContent=`Sun direction: ${azLbls[time]}`;
+
+  let sunSide, hint, lcDesc, rcDesc, lcCls, rcCls, lcIco, rcIco;
+  if (time==='morning') {
+    sunSide='right';
+    hint='Morning sun is from the <em>East</em>. For most N-S routes → LEFT side is shaded. For E-W routes → rear rows are shaded. When in doubt, choose LEFT side or middle aisle.';
+    lcCls='shade'; lcIco='🌿'; lcDesc='Shaded for most N-S routes'; 
+    rcCls='sunny'; rcIco='☀'; rcDesc='Direct sun — avoid window & middle';
+  } else if (time==='midday') {
+    sunSide='both-mild';
+    hint='Midday sun is nearly <em>overhead</em>. Both sides get similar light. Pick aisle seats in rows 3–7 on either side — avoid window seats.';
+    lcCls='neutral'; lcIco='◑'; lcDesc='Similar to right — avoid window';
+    rcCls='neutral'; rcIco='◑'; rcDesc='Similar to left — avoid window';
+  } else if (time==='afternoon') {
+    sunSide='left';
+    hint='Afternoon sun is from the <em>West</em>. For most N-S routes → RIGHT side (3-seat side) is shaded. Any of the 3 right-side seats work well.';
+    lcCls='sunny'; lcIco='☀'; lcDesc='Direct sun — avoid window seats';
+    rcCls='shade'; rcIco='🌿'; rcDesc='Shaded — all 3 seats are good';
+  } else {
+    sunSide='none';
+    hint='Evening sun is very <em>low and soft</em>. Any seat on any bus is comfortable right now — sit freely!';
+    lcCls='shade'; lcIco='✓'; lcDesc='Any seat comfortable now';
+    rcCls='shade'; rcIco='✓'; rcDesc='Any seat comfortable now';
+  }
+
+  document.getElementById('seatHint').innerHTML=hint;
+  const sL=document.getElementById('scLeft'), sR=document.getElementById('scRight');
+  sL.className='scard '+lcCls;
+  document.getElementById('scLIco').textContent=lcIco;
+  document.getElementById('scLLbl').textContent='Left side (2 seats)';
+  document.getElementById('scLDesc').textContent=lcDesc;
+  sR.className='scard '+rcCls;
+  document.getElementById('scRIco').textContent=rcIco;
+  document.getElementById('scRLbl').textContent='Right side (3 seats)';
+  document.getElementById('scRDesc').textContent=rcDesc;
+
+  setChips('lh',sunSide);
+  buildGrid('gridLoc',sunSide,true);
+
+  const msgs={
+    right:'For local routes right now: LEFT side (2-seat side) is shaded. Sit LEFT window or aisle in rows 3–8. The right 3-seat side — especially window and middle — gets direct morning sun.',
+    left:'For local routes right now: RIGHT side (3-seat side) is shaded. Right window or right middle seats (rows 3–8) are best. Avoid both left-side seats this time of day.',
+    'both-mild':'Midday — both sides are similar. Choose aisle seats (left aisle or right aisle) in rows 3–7 on any local bus. Avoid window seats on both sides.',
+    none:'Evening light is gentle and low. Sit anywhere on any local bus — you are comfortable either side!'
+  };
+  setRec(true,'Recommended for any local bus now',msgs[sunSide]||'',sunSide==='none'?'excellent':'good');
+}
+
+// ── Init ──
+updateLong();
+updateLocal();
+</script>
+</body>
+</html>
